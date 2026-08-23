@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/Core/" />
+  <Folder Name="/Infrastructure/" />
+  <Project Path="LibraryManagementSystem/LibraryManagementSystem.csproj" />
+</Solution>
