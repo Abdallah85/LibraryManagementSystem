@@ -1,0 +1,70 @@
+services:
+
+  librarymanagementsystemapi:
+    image: ${DOCKER_REGISTRY-}librarymanagementsystemapi
+
+    build:
+      context: .
+      dockerfile: LibraryManagementSystem/Dockerfile
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=mydatabase;Username=admin;Password=admin;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=100;Connection Idle Lifetime=300;Timeout=15;Command Timeout=30;
+
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+
+    networks:
+      - app-network
+
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    container_name: postgres
+
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+
+    volumes:
+      - pg_data1:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+
+    networks:
+      - app-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mydatabase"]
+      interval: 10s
+      retries: 5
+
+
+  dbgate:
+    image: dbgate/dbgate
+    restart: always
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - dbgate-data:/root/.dbgate
+
+    networks:
+      - app-network
+
+
+volumes:
+  pg_data1:
+  dbgate-data:
+
+
+networks:
+  app-network:
+    driver: bridge

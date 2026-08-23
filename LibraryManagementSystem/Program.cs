@@ -1,4 +1,7 @@
 
+using LibraryManagementSystemApi.Middelwares;
+using Persistence;
+
 namespace LibraryManagementSystem
 {
     public class Program
@@ -10,23 +13,22 @@ namespace LibraryManagementSystem
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            builder.Services.AddSwaggerGen();
+
+            // Add infrastructure services
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
+            
+            app.UseSwagger();    
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
+
+
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.Run();
         }

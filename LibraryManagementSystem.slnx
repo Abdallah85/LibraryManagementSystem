@@ -8,6 +8,9 @@
     <Project Path="Persistence/Persistence.csproj" />
     <Project Path="Presentation/Presentation.csproj" />
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
   <Project Path="LibraryManagementSystem/LibraryManagementSystemApi.csproj" />
   <Project Path="Shared/Shared.csproj" />
 </Solution>
