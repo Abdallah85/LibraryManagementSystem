@@ -4,7 +4,7 @@ namespace Domain.Entities;
 
 public class ActivityLog : BaseEntity
 {
-    public int? UserId { get; set; }
+    public string? UserId { get; set; }
     public User? User { get; set; }
 
     public string Action { get; set; } = default!;         

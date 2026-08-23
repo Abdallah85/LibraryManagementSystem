@@ -8,10 +8,10 @@ public class BorrowingTransaction : BaseEntity
     public int BookId { get; set; }
     public Book Book { get; set; } = default!;
 
-    public int MemberId { get; set; }
-    public Member Member { get; set; } = default!;
+    public string UserId { get; set; } =null!;
+    public User User { get; set; } = default!;
 
-    public int IssuedByUserId { get; set; }
+    public string IssuedByUserId { get; set; } = null!;
     public User IssuedByUser { get; set; } = default!;
 
     public DateTime BorrowDate { get; set; } = DateTime.UtcNow;
