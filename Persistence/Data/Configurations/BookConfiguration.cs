@@ -12,7 +12,7 @@ namespace Persistence.Data.Configurations
         public void Configure(EntityTypeBuilder<Book> builder)
         {
             builder.ToTable("books");
-            builder.HasKey(b => new {b.Id, b.ISBN });
+            builder.HasKey(b => b.Id );
 
             builder.Property(b => b.ISBN).IsRequired().HasMaxLength(20);
             builder.HasIndex(b => b.ISBN).IsUnique();
