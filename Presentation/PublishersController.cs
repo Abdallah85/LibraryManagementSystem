@@ -45,9 +45,9 @@ namespace Presentation
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? searchTerm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAll([FromQuery] PublisherFilterDto filterDto)
         {
-            var result = await _publisherService.GetAllPublishersAsync(searchTerm, pageNumber, pageSize);
+            var result = await _publisherService.GetAllPublishersAsync(filterDto);
             return Ok(result);
         }
     }

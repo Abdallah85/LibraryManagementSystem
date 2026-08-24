@@ -44,7 +44,7 @@ namespace Services.Extension
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ILanguageService, LanguageService>();
-            services.AddScoped<ILanguageService,LanguageService>();
+            services.AddScoped<ICategoryService,CategoryService>();
             services.AddScoped<IPublisherService, PublisherService>();
 
 

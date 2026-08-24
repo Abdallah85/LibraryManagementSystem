@@ -1,5 +1,7 @@
 
+using LibraryManagementSystemApi;
 using LibraryManagementSystemApi.Middelwares;
+using Microsoft.OpenApi;
 using Persistence;
 using Persistence.Identity;
 using Presentation;
@@ -13,15 +15,12 @@ namespace LibraryManagementSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
 
-            builder.Services.AddControllers()
-            .AddApplicationPart(typeof(AuthController).Assembly);
-            builder.Services.AddSwaggerGen();
 
             // Add infrastructure services
-            builder.Services.AddInfrastructure(builder.Configuration);
-            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddWebApplicationServices(builder.Configuration)
+                .AddInfrastructure(builder.Configuration)
+                .AddApplicationServices(builder.Configuration);
 
 
             var app = builder.Build();
@@ -32,6 +31,7 @@ namespace LibraryManagementSystem
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 

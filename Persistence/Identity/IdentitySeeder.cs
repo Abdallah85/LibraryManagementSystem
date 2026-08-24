@@ -18,13 +18,17 @@ namespace Persistence.Identity
 
         public static async Task SeedRolesAsync(WebApplication app)
         {
+
             var scope = app.Services.CreateScope();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-            foreach (var roleName in RoleNames)
-            {
-                if (!await roleManager.RoleExistsAsync(roleName))
-                    await roleManager.CreateAsync(new Role { Name = roleName });
+            if (!roleManager.Roles.Any()) {
+
+                foreach (var roleName in RoleNames)
+                {
+                    if (!await roleManager.RoleExistsAsync(roleName))
+                        await roleManager.CreateAsync(new Role { Name = roleName });
+                }
             }
         }
     }
