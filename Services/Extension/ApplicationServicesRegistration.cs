@@ -43,6 +43,8 @@ namespace Services.Extension
             // register services
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ILanguageService, LanguageService>();
+            services.AddScoped<ILanguageService,LanguageService>();
 
 
             return services;
