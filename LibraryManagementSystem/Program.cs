@@ -1,7 +1,7 @@
 
 using LibraryManagementSystemApi.Middelwares;
 using Persistence;
-using Persistence.Data.Identity;
+using Persistence.Identity;
 
 namespace LibraryManagementSystem
 {

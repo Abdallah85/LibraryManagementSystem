@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Persistence.Data.Identity
+namespace Persistence.Identity
 {
     public static class IdentitySeeder
     {
