@@ -1,12 +1,13 @@
 
 using LibraryManagementSystemApi.Middelwares;
 using Persistence;
+using Persistence.Data.Identity;
 
 namespace LibraryManagementSystem
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,9 @@ namespace LibraryManagementSystem
             builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
-            
+
+            await IdentitySeeder.InitIdentity(app);
+
             app.UseSwagger();    
             app.UseSwaggerUI();
 
