@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities;
 
-public class User : IdentityUser<string>
+public class User : IdentityUser
 {
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

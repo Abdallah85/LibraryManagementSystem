@@ -8,10 +8,10 @@ namespace Persistence.Identity
 {
     public static class IdentitySeeder
     {
-        private static readonly string[] RoleNames = { "Administrator", "Librarian", "Staff" };
+        private static readonly string[] RoleNames = { "Administrator", "Librarian", "Staff","Member" };
 
 
-        public static async Task InitIdentity(WebApplication app)
+        public static async Task InitIdentityAsync(WebApplication app)
         {
             await SeedRolesAsync(app);
         }

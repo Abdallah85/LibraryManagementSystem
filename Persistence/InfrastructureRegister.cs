@@ -1,12 +1,13 @@
 ﻿
 
+using Domain.Contracts;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Persistence.Data;
+using Persistence.Repositories;
 
 namespace Persistence
 {
@@ -37,6 +38,8 @@ namespace Persistence
             .AddEntityFrameworkStores<AppDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

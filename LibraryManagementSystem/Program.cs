@@ -2,6 +2,8 @@
 using LibraryManagementSystemApi.Middelwares;
 using Persistence;
 using Persistence.Identity;
+using Presentation;
+using Services.Extension;
 
 namespace LibraryManagementSystem
 {
@@ -13,15 +15,18 @@ namespace LibraryManagementSystem
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+            .AddApplicationPart(typeof(AuthController).Assembly);
             builder.Services.AddSwaggerGen();
 
             // Add infrastructure services
             builder.Services.AddInfrastructure(builder.Configuration);
+            builder.Services.AddApplicationServices(builder.Configuration);
+
 
             var app = builder.Build();
 
-            await IdentitySeeder.InitIdentity(app);
+            await IdentitySeeder.InitIdentityAsync(app);
 
             app.UseSwagger();    
             app.UseSwaggerUI();

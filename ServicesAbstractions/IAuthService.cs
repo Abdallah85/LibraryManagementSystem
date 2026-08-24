@@ -1,12 +1,11 @@
-using LibrarySystem.Application.Common;
-using LibrarySystem.Application.DTOs.Auth;
+using Shared;
+using Shared.Dtos.Auth;
 
 namespace ServicesAbstractions;
 
 public interface IAuthService
 {
-    Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterRequest request);
-    Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginRequest request, string? ipAddress);
-    Task<ServiceResult<AuthResponseDto>> RefreshTokenAsync(string rawRefreshToken, string? ipAddress);
-    Task<ServiceResult<bool>> RevokeTokenAsync(string rawRefreshToken, string? ipAddress);
+    Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequest request);
+    Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginRequest request);
+    Task<ApiResponse<AuthResponseDto>> RefreshTokenAsync(string rawRefreshToken);
 }
