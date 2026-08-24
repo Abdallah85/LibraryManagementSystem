@@ -45,6 +45,7 @@ namespace Services.Extension
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<ILanguageService,LanguageService>();
+            services.AddScoped<IPublisherService, PublisherService>();
 
 
             return services;
