@@ -248,6 +248,18 @@ Bearer YOUR_ACCESS_TOKEN
 
 ---
 
+## Authors
+
+| Method | Endpoint |
+|----------|------------|
+| POST | /api/authors |
+| GET | /api/authors |
+| GET | /api/authors/{id} |
+| PUT | /api/authors/{id} |
+| DELETE | /api/authors/{id} |
+
+---
+
 ## Categories
 
 | Method | Endpoint |
