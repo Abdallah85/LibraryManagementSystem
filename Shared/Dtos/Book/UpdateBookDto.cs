@@ -19,5 +19,7 @@ namespace Shared.Dtos.Book
         // Null = leave author/category links untouched. Empty list = clear all links.
         public List<int>? AuthorIds { get; set; }
         public List<int>? CategoryIds { get; set; }
+
+        public string? UpdatedBy { get; set; }
     }
 }

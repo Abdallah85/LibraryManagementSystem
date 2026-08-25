@@ -18,5 +18,7 @@ namespace Shared.Dtos.Book
 
         public List<int> AuthorIds { get; set; } = new();
         public List<int> CategoryIds { get; set; } = new();
+
+        public string? CreatedBy { get; set; }
     }
 }

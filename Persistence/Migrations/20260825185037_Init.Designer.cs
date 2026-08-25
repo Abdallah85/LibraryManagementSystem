@@ -13,8 +13,8 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260825173322_Make_IssuedUserIdNullable")]
-    partial class Make_IssuedUserIdNullable
+    [Migration("20260825185037_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

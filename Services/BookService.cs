@@ -4,6 +4,7 @@ using Domain.Exceptions;
 using Services.Specifications;
 using ServicesAbstractions;
 using Shared;
+using Shared.Dtos.ActivityLog;
 using Shared.Dtos.Book;
 using System.Linq.Expressions;
 
@@ -13,11 +14,13 @@ namespace Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IActivityLogService _activityLog;
 
-        public BookService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
+        public BookService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService, IActivityLogService activityLog)
         {
             _unitOfWork = unitOfWork;
             _fileStorageService = fileStorageService;
+            _activityLog = activityLog;
         }
 
         public async Task<ApiResponse<string>> CreateBookAsync(CreateBookDto dto)
@@ -59,6 +62,17 @@ namespace Services
 
             _unitOfWork.GetRepository<Book>().Add(book);
             await _unitOfWork.SaveChangesAsync();
+
+            //Log the creation of the book
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = dto.CreatedBy,
+                Action = "Create",
+                EntityAffected = nameof(Book),
+                EntityId = book.Id,
+                Details = $"Book '{book.Title}' with ISBN '{book.ISBN}' created."
+            });
+
 
             return new ApiResponse<string>
             {
@@ -114,7 +128,15 @@ namespace Services
             if (dto.CategoryIds is not null)
                 await ReplaceBookCategoriesAsync(bookId, dto.CategoryIds);
 
-            await _unitOfWork.SaveChangesAsync();
+            //Log the update of the book
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = dto.UpdatedBy,
+                Action = "Update",
+                EntityAffected = nameof(Book),
+                EntityId = bookId,
+                Details = $"Book '{existingBook.Title}' with ISBN '{existingBook.ISBN}' updated."
+            });
 
             return new ApiResponse<string>
             {
@@ -124,7 +146,7 @@ namespace Services
             };
         }
 
-        public async Task<ApiResponse<string>> DeleteBookAsync(int bookId)
+        public async Task<ApiResponse<string>> DeleteBookAsync(int bookId, string deletedBy)
         {
             var spec = new GeneralSpecifications<Book>(b => b.Id == bookId);
             var existingBook = await _unitOfWork.GetRepository<Book>().GetAsync(spec);
@@ -137,7 +159,16 @@ namespace Services
             }
 
             _unitOfWork.GetRepository<Book>().Delete(existingBook);
-            await _unitOfWork.SaveChangesAsync();
+
+            //Log the deletion of the book
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = deletedBy,
+                Action = "Delete",
+                EntityAffected = nameof(Book),
+                EntityId = bookId,
+                Details = $"Book '{existingBook.Title}' with ISBN '{existingBook.ISBN}' deleted."
+            });
 
             return new ApiResponse<string>
             {

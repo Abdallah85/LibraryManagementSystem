@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Extensions;
 using ServicesAbstractions;
 using Shared.Dtos.Book;
 
@@ -36,6 +37,8 @@ namespace API.Controllers
         [Authorize(Roles = "Administrator,Librarian")]
         public async Task<IActionResult> CreateBook([FromForm] CreateBookDto dto)
         {
+            var createdBy = User.GetUserId();
+            dto.CreatedBy = createdBy;
             var result = await _bookService.CreateBookAsync(dto);
             return Ok(result);
         }
@@ -44,6 +47,8 @@ namespace API.Controllers
         [Authorize(Roles = "Administrator,Librarian")]
         public async Task<IActionResult> UpdateBook(int id, [FromForm] UpdateBookDto dto)
         {
+            var updatedBy = User.GetUserId();
+            dto.UpdatedBy = updatedBy;
             var result = await _bookService.UpdateBookAsync(id, dto);
             return Ok(result);
         }
@@ -52,7 +57,8 @@ namespace API.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            var result = await _bookService.DeleteBookAsync(id);
+            var deletedBy = User.GetUserId();
+            var result = await _bookService.DeleteBookAsync(id, deletedBy!);
             return Ok(result);
         }
     }

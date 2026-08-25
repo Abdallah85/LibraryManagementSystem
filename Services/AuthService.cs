@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using ServicesAbstractions;
 using Shared;
 using Shared.Config;
+using Shared.Dtos.ActivityLog;
 using Shared.Dtos.Auth;
 
 namespace Services
@@ -14,24 +15,24 @@ namespace Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly JwtSettings _jwtSettings;
+        private readonly IActivityLogService _activityLog;
 
         private const string DefaultRole = "Member";
 
         public AuthService(
             UserManager<User> userManager,
-            RoleManager<Role> roleManager,
             ITokenService tokenService,
             IUnitOfWork unitOfWork,
+            IActivityLogService activityLog,
             IOptions<JwtSettings> jwtOptions)
         {
             _userManager = userManager;
-            _roleManager = roleManager;
             _tokenService = tokenService;
             _unitOfWork = unitOfWork;
+            _activityLog = activityLog;
             _jwtSettings = jwtOptions.Value;
         }
 
@@ -62,6 +63,17 @@ namespace Services
             await _userManager.AddToRoleAsync(user, DefaultRole);
 
             var authResponse = await BuildAuthResponseAsync(user);
+
+            // Log the registration activity
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = user.Id,
+                Action = "UserRegistered",
+                EntityAffected = nameof(User),
+                EntityId = null,
+                Details = $"New user '{user.UserName}' registered with email '{user.Email}'"
+            });
+
             return ApiResponse<AuthResponseDto>.SuccessResponse(authResponse, "Registration successful.");
         }
 
@@ -80,6 +92,17 @@ namespace Services
                 throw new UnauthorizedException("Invalid credentials.");
 
             var authResponse = await BuildAuthResponseAsync(user);
+
+            // Log the login activity
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = user.Id,
+                Action = "UserLoggedIn",
+                EntityAffected = nameof(User),
+                EntityId = null,
+                Details = $"User '{user.UserName}' logged in."
+            });
+
             return ApiResponse<AuthResponseDto>.SuccessResponse(authResponse, "Login successful.");
         }
 
@@ -104,7 +127,15 @@ namespace Services
             refreshTokenRepo.Update(storedToken);
 
             var authResponse = await BuildAuthResponseAsync(storedToken.User);
-            await _unitOfWork.SaveChangesAsync();
+
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = storedToken.UserId,
+                Action = "TokenRefreshed",
+                EntityAffected = nameof(User),
+                EntityId = null,
+                Details = $"User '{storedToken.User.UserName}' refreshed their token."
+            });
 
             return ApiResponse<AuthResponseDto>.SuccessResponse(authResponse, "Token refreshed.");
         }
@@ -130,8 +161,6 @@ namespace Services
                 IsExpired = false,
                 IsRevoked = false,
             });
-
-            await _unitOfWork.SaveChangesAsync();
 
             return new AuthResponseDto
             {

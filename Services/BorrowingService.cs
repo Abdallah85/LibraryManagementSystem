@@ -4,6 +4,7 @@ using Domain.Exceptions;
 using Services.Specifications;
 using ServicesAbstractions;
 using Shared;
+using Shared.Dtos.ActivityLog;
 using Shared.Dtos.Borrowing;
 using System.Linq.Expressions;
 
@@ -12,10 +13,12 @@ namespace Services
     public class BorrowingService : IBorrowingService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IActivityLogService _activityLog;
 
-        public BorrowingService(IUnitOfWork unitOfWork)
+        public BorrowingService(IUnitOfWork unitOfWork, IActivityLogService activityLog)
         {
             _unitOfWork = unitOfWork;
+            _activityLog = activityLog;
         }
         public async Task<ApiResponse<string>> BorrowBookAsync(string userId, BorrowBookDto dto)
         {
@@ -62,6 +65,17 @@ namespace Services
 
             _unitOfWork.GetRepository<BorrowingTransaction>().Add(transaction);
             await _unitOfWork.SaveChangesAsync();
+
+
+            // Log the borrow request activity
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = userId,
+                Action = "Borrow Request",
+                EntityAffected = nameof(BorrowingTransaction),
+                EntityId = transaction.Id,
+                Details = $"Borrow request submitted for book '{transaction.Book.Title}'"
+            });
 
             return new ApiResponse<string>
             {
@@ -129,7 +143,15 @@ namespace Services
             transaction.Status = Domain.Enums.BorrowingStatus.ReturnPending;
 
             _unitOfWork.GetRepository<BorrowingTransaction>().Update(transaction);
-            await _unitOfWork.SaveChangesAsync();
+
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = userId,
+                Action = "Return Request",
+                Details = $"Return request submitted for book '{transaction.Book.Title}'",
+                EntityAffected = nameof(BorrowingTransaction),
+                EntityId = transaction.Id
+            });
 
             return new ApiResponse<string>
             {
@@ -164,7 +186,16 @@ namespace Services
                 .GetRepository<BorrowingTransaction>()
                 .Update(transaction);
 
-            await _unitOfWork.SaveChangesAsync();
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                EntityId = transactionId,
+                EntityAffected = nameof(BorrowingTransaction),
+                Details = dto.IsApproved
+                    ? $"Borrow request approved for book '{transaction.Book.Title}'"
+                    : $"Borrow request rejected for book '{transaction.Book.Title}'",
+                Action = dto.IsApproved ? "Borrow Request Approved" : "Borrow Request Rejected",
+                UserId = librarianId
+            });
 
             return new ApiResponse<string>
             {
@@ -201,7 +232,15 @@ namespace Services
             transaction.IssuedByUserId = librarianId;
 
             _unitOfWork.GetRepository<BorrowingTransaction>().Update(transaction);
-            await _unitOfWork.SaveChangesAsync();
+
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                EntityId = transactionId,
+                EntityAffected = nameof(BorrowingTransaction),
+                Details = $"Return request approved for book '{transaction.Book.Title}'",
+                Action = "Return Request Approved",
+                UserId = librarianId
+            });
 
             return new ApiResponse<string>
             {
