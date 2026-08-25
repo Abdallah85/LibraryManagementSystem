@@ -4,6 +4,7 @@ using Domain.Exceptions;
 using Services.Specifications;
 using ServicesAbstractions;
 using Shared;
+using Shared.Dtos.ActivityLog;
 using Shared.Dtos.Publisher;
 using System.Linq.Expressions;
 
@@ -12,10 +13,12 @@ namespace Services
     public class PublisherService : IPublisherService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IActivityLogService _activityLog;
 
-        public PublisherService(IUnitOfWork unitOfWork)
+        public PublisherService(IUnitOfWork unitOfWork, IActivityLogService activityLog)
         {
             _unitOfWork = unitOfWork;
+            _activityLog = activityLog;
         }
 
         public async Task<ApiResponse<string>> CreatePublisherAsync(CreatePublisherDto dto)
@@ -36,6 +39,17 @@ namespace Services
 
             _unitOfWork.GetRepository<Publisher>().Add(publisher);
             await _unitOfWork.SaveChangesAsync();
+
+            // Log the creation of the publisher
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = dto.CreatedBy,
+                Action = "Create",
+                Details = $"Publisher '{dto.Name}' created with ID {publisher.Id}",
+                EntityAffected = nameof(Publisher),
+                EntityId = publisher.Id
+
+            });
 
             return new ApiResponse<string>
             {
@@ -65,7 +79,15 @@ namespace Services
             existingPublisher.Website = dto.Website ?? existingPublisher.Website;
 
             _unitOfWork.GetRepository<Publisher>().Update(existingPublisher);
-            await _unitOfWork.SaveChangesAsync();
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = dto.UpdatedBy,
+                Action = "Update",
+                EntityId = existingPublisher.Id,
+                EntityAffected = nameof(Publisher),
+                Details = $"Publisher '{existingPublisher.Name}' updated"
+
+            });
 
             return new ApiResponse<string>
             {
@@ -75,7 +97,7 @@ namespace Services
             };
         }
 
-        public async Task<ApiResponse<string>> DeletePublisherAsync(int publisherId)
+        public async Task<ApiResponse<string>> DeletePublisherAsync(int publisherId, string deletedBy)
         {
             var spec = new GeneralSpecifications<Publisher>(p => p.Id == publisherId);
             var existingPublisher = await _unitOfWork.GetRepository<Publisher>().GetAsync(spec);
@@ -83,7 +105,16 @@ namespace Services
             if (existingPublisher is null) throw new NotFoundException($"Publisher with id {publisherId} not found");
 
             _unitOfWork.GetRepository<Publisher>().Delete(existingPublisher);
-            await _unitOfWork.SaveChangesAsync();
+
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                UserId = deletedBy,
+                Action = "Delete",
+                EntityId = existingPublisher.Id,
+                EntityAffected = nameof(Publisher),
+                Details = $"Publisher '{existingPublisher.Name}' deleted"
+
+            });
 
             return new ApiResponse<string>
             {

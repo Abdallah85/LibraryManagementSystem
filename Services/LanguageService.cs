@@ -12,10 +12,12 @@ namespace Services
     public class LanguageService : ILanguageService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IActivityLogService _activityLog;
 
-        public LanguageService(IUnitOfWork unitOfWork)
+        public LanguageService(IUnitOfWork unitOfWork, IActivityLogService activityLog)
         {
             _unitOfWork = unitOfWork;
+            _activityLog = activityLog;
         }
 
         public async Task<ApiResponse<string>> CreateLanguageAsync(CreateLanguageDto dto)
@@ -38,6 +40,16 @@ namespace Services
 
             _unitOfWork.GetRepository<Language>().Add(language);
             await _unitOfWork.SaveChangesAsync();
+
+            //Log the creation of the language
+            await _activityLog.LogAsync(new Shared.Dtos.ActivityLog.CreateActivityLogDto
+            {
+                UserId = dto.CreatedBy,
+                Action = "Create",
+                Details = $"Language '{language.Name}' with code '{language.Code}' created.",
+                EntityAffected = nameof(Language),
+                EntityId = language.Id
+            });
 
             return new ApiResponse<string>
             {
@@ -72,7 +84,17 @@ namespace Services
             existingLanguage.Code = dto.Code ?? existingLanguage.Code;
 
             _unitOfWork.GetRepository<Language>().Update(existingLanguage);
-            await _unitOfWork.SaveChangesAsync();
+
+
+            //Log the update of the language
+            await _activityLog.LogAsync(new Shared.Dtos.ActivityLog.CreateActivityLogDto
+            {
+                UserId = dto.UpdatedBy,
+                Action = "Update",
+                Details = $"Language '{existingLanguage.Name}' with code '{existingLanguage.Code}' updated.",
+                EntityAffected = nameof(Language),
+                EntityId = existingLanguage.Id
+            });
 
             return new ApiResponse<string>
             {
@@ -82,7 +104,7 @@ namespace Services
             };
         }
 
-        public async Task<ApiResponse<string>> DeleteLanguageAsync(int languageId)
+        public async Task<ApiResponse<string>> DeleteLanguageAsync(int languageId, string? deletedBy)
         {
             var spec = new GeneralSpecifications<Language>(l => l.Id == languageId);
             var existingLanguage = await _unitOfWork.GetRepository<Language>().GetAsync(spec);
@@ -91,6 +113,16 @@ namespace Services
 
             _unitOfWork.GetRepository<Language>().Delete(existingLanguage);
             await _unitOfWork.SaveChangesAsync();
+
+            //Log the deletion of the language
+            await _activityLog.LogAsync(new Shared.Dtos.ActivityLog.CreateActivityLogDto
+            {
+                UserId = deletedBy,
+                Action = "Delete",
+                Details = $"Language '{existingLanguage.Name}' with code '{existingLanguage.Code}' deleted.",
+                EntityAffected = nameof(Language),
+                EntityId = existingLanguage.Id
+            });
 
             return new ApiResponse<string>
             {
