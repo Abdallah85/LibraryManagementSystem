@@ -171,8 +171,9 @@ namespace Services
             Expression<Func<Book, bool>> criteria = b =>
                 (string.IsNullOrWhiteSpace(filterDto.SearchTerm) ||
                     b.Title.ToLower().Trim().Contains(filterDto.SearchTerm.ToLower().Trim()) ||
-                    b.Summary.ToLower().Trim().Contains(filterDto.SearchTerm.ToLower().Trim()) ||
-                    b.ISBN.ToLower().Trim().Contains(filterDto.SearchTerm.ToLower().Trim())) &&
+                    b.ISBN.ToLower().Trim().Contains(filterDto.SearchTerm.ToLower().Trim()) ||
+                    b.BookAuthors.Any(ba => ba.Author.FullName.ToLower().Trim().Contains(filterDto.SearchTerm.ToLower().Trim())) ||
+                    b.BookCategories.Any(bc => bc.Category.Name.ToLower().Trim().Contains(filterDto.SearchTerm.ToLower().Trim()))) &&
                 (!filterDto.LanguageId.HasValue || b.LanguageId == filterDto.LanguageId) &&
                 (!filterDto.CategoryId.HasValue || b.BookCategories.Any(bc => bc.CategoryId == filterDto.CategoryId)) &&
                 (!filterDto.AuthorId.HasValue || b.BookAuthors.Any(ba => ba.AuthorId == filterDto.AuthorId));

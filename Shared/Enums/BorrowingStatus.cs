@@ -2,7 +2,10 @@ namespace Shared.Enums;
 
 public enum BorrowingStatus
 {
-    Borrowed = 0,
-    Returned = 1,
-    Overdue = 2
+    Pending = 0,
+    Borrowed = 1,
+    ReturnPending = 2,
+    Returned = 3,
+    Rejected = 4,
+    Overdue = 5
 }
