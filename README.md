@@ -318,6 +318,100 @@ curl -X GET https://localhost:7152/api/categories \
 
 ---
 
+## Database Relationships (ERD)
+
+![Library Management System ERD](assets/erd.png)
+
+`Book` is the hub, linked directly to `Language` and `Publisher`, and to `Author`/`Category` through the `BookAuthor`/`BookCategory` junction tables. `User` connects out to `BorrowingTransaction`, `RefreshToken`, and `ActivityLog`.
+
+<details>
+<summary>Mermaid source (renders live on GitHub)</summary>
+
+```mermaid
+erDiagram
+  USER ||--o{ BORROWINGTRANSACTION : borrows
+  BOOK ||--o{ BORROWINGTRANSACTION : "is borrowed in"
+  USER ||--o{ REFRESHTOKEN : has
+  USER ||--o{ ACTIVITYLOG : generates
+  LANGUAGE ||--o{ BOOK : "written in"
+  PUBLISHER ||--o{ BOOK : publishes
+  BOOK ||--o{ BOOKAUTHOR : has
+  AUTHOR ||--o{ BOOKAUTHOR : writes
+  BOOK ||--o{ BOOKCATEGORY : has
+  CATEGORY ||--o{ BOOKCATEGORY : classifies
+
+  USER {
+    guid Id PK
+    string UserName
+    string Email
+    string PasswordHash
+    bool IsActive
+    string MembershipStatus
+  }
+  BOOK {
+    int Id PK
+    string ISBN
+    string Title
+    string Edition
+    int PublicationYear
+    string Status
+    int LanguageId FK
+    int PublisherId FK
+  }
+  CATEGORY {
+    int Id PK
+    string Name
+    string Description
+  }
+  LANGUAGE {
+    int Id PK
+    string Name
+    string Code
+  }
+  PUBLISHER {
+    int Id PK
+    string Name
+    string Address
+    string ContactEmail
+  }
+  AUTHOR {
+    int Id PK
+    string FullName
+    string Bio
+  }
+  BOOKAUTHOR {
+    int BookId FK
+    int AuthorId FK
+  }
+  BOOKCATEGORY {
+    int BookId FK
+    int CategoryId FK
+  }
+  BORROWINGTRANSACTION {
+    int Id PK
+    guid UserId FK
+    int BookId FK
+    datetime BorrowedAt
+    datetime ReturnedAt
+  }
+  REFRESHTOKEN {
+    guid Id PK
+    guid UserId FK
+    string TokenHash
+    datetime ExpiresAt
+  }
+  ACTIVITYLOG {
+    guid Id PK
+    guid UserId FK
+    string Action
+    datetime CreatedAt
+  }
+```
+
+</details>
+
+---
+
 ## Docker
 
 ### Build Image
@@ -469,27 +563,9 @@ curl https://localhost:7152/swagger/index.html
 - SQL injection protection (EF Core parameterized queries)
 - Soft deletes preserve data integrity
 
-⚠️ **For Production**:
-- Store secrets in Azure Key Vault or HashiCorp Vault
-- Enable CORS only for trusted domains
-- Implement rate limiting
-- Add request logging/auditing
-- Use HSTS headers
-- Consider OAuth2/OpenID Connect for complex auth
-- Regular security audits
 
 ---
 
 ## License
 
 See LICENSE file in repository.
-
----
-
-## Support
-
-Issues or questions? Create a GitHub issue or contact the repository maintainer.
-
-**Repository**: https://github.com/Abdallah85/LibraryManagementSystem  
-**Last Updated**: January 2026  
-**Framework Version**: .NET 10
