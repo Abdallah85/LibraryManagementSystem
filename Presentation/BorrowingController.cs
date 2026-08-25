@@ -18,7 +18,7 @@ namespace Presentation
         }
 
 
-        
+        [Authorize(Roles = "Member")]
         [HttpPost()]
         public async Task<IActionResult> BorrowBook([FromBody] BorrowBookDto dto)
         {
