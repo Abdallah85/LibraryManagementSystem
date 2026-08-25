@@ -229,7 +229,7 @@ POST /api/auth/refresh-token
 3. Enter:
 
 ```text
-Bearer YOUR_ACCESS_TOKEN
+YOUR_ACCESS_TOKEN
 ```
 
 4. Execute secured endpoints
