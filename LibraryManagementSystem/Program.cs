@@ -32,6 +32,7 @@ namespace LibraryManagementSystem
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.UseStaticFiles();
 
 
             app.UseMiddleware<GlobalExceptionMiddleware>();

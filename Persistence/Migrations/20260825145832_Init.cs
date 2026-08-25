@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -150,7 +151,7 @@ namespace Persistence.Migrations
                     Edition = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     Summary = table.Column<string>(type: "text", nullable: true),
                     PublicationYear = table.Column<int>(type: "integer", nullable: false),
-                    CoverImageUrl = table.Column<string>(type: "text", nullable: true),
+                    ImageUrls = table.Column<List<string>>(type: "text[]", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     LanguageId = table.Column<int>(type: "integer", nullable: false),
                     PublisherId = table.Column<int>(type: "integer", nullable: false),

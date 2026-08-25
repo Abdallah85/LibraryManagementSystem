@@ -21,6 +21,10 @@ namespace Persistence.Data.Configurations
             builder.Property(b => b.Edition).HasMaxLength(50);
             builder.Property(b => b.Summary).HasColumnType("text");
 
+            builder.Property(b => b.ImageUrls)
+            .HasColumnType("text[]")
+            .IsRequired(false);
+
 
             builder.HasOne(b => b.Language)
                 .WithMany(l => l.Books)

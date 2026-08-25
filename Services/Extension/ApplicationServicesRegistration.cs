@@ -46,6 +46,8 @@ namespace Services.Extension
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<ICategoryService,CategoryService>();
             services.AddScoped<IPublisherService, PublisherService>();
+            services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IFileStorageService,LocalFileStorageService>();
 
 
             return services;

@@ -1,4 +1,4 @@
-﻿global using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ServicesAbstractions;
 using Shared.Dtos.Auth;
 

@@ -11,7 +11,7 @@ public class Book : BaseEntity
     public string? Edition { get; set; }
     public string? Summary { get; set; }
     public int PublicationYear { get; set; }
-    public string? CoverImageUrl { get; set; }
+    public List<string> ImageUrls { get; set; } = new();
     public BookStatus Status { get; set; } = BookStatus.InLibrary;
 
     public int LanguageId { get; set; }

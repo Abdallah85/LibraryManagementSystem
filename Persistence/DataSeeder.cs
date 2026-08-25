@@ -265,7 +265,6 @@ namespace Persistence
                     Edition = "First Edition",
                     Summary = "A classic American novel set in the Jazz Age",
                     PublicationYear = 1925,
-                    CoverImageUrl = "https://example.com/great-gatsby.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 1, // Penguin Books
@@ -278,7 +277,6 @@ namespace Persistence
                     Edition = "Reprint",
                     Summary = "A dystopian social science fiction novel",
                     PublicationYear = 1949,
-                    CoverImageUrl = "https://example.com/1984.jpg",
                     Status = BookStatus.CheckedOut,
                     LanguageId = 1, // English
                     PublisherId = 2, // Hachette Book Group
@@ -291,7 +289,6 @@ namespace Persistence
                     Edition = "Classic Edition",
                     Summary = "A romantic novel by Jane Austen",
                     PublicationYear = 1813,
-                    CoverImageUrl = "https://example.com/pride-prejudice.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 3, // Simon & Schuster
@@ -304,7 +301,6 @@ namespace Persistence
                     Edition = "Oxford World Classics",
                     Summary = "A historical novel by Leo Tolstoy",
                     PublicationYear = 1869,
-                    CoverImageUrl = "https://example.com/war-peace.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 5, // Oxford University Press
@@ -317,7 +313,6 @@ namespace Persistence
                     Edition = "Dover Thrift",
                     Summary = "A novel by Mark Twain about a young boy's adventures",
                     PublicationYear = 1876,
-                    CoverImageUrl = "https://example.com/tom-sawyer.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 4, // Random House
@@ -330,7 +325,6 @@ namespace Persistence
                     Edition = "Anniversary Edition",
                     Summary = "A fantasy novel by J.R.R. Tolkien",
                     PublicationYear = 1937,
-                    CoverImageUrl = "https://example.com/hobbit.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 1, // Penguin Books
@@ -343,7 +337,6 @@ namespace Persistence
                     Edition = "50th Anniversary",
                     Summary = "A science fiction novel by Isaac Asimov",
                     PublicationYear = 1951,
-                    CoverImageUrl = "https://example.com/foundation.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 2, // Hachette Book Group
@@ -356,7 +349,6 @@ namespace Persistence
                     Edition = "Special Edition",
                     Summary = "A horror novel by Stephen King",
                     PublicationYear = 1977,
-                    CoverImageUrl = "https://example.com/shining.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 3, // Simon & Schuster
@@ -369,7 +361,6 @@ namespace Persistence
                     Edition = "US Edition",
                     Summary = "The first book in the Harry Potter series",
                     PublicationYear = 1998,
-                    CoverImageUrl = "https://example.com/hp1.jpg",
                     Status = BookStatus.CheckedOut,
                     LanguageId = 1, // English
                     PublisherId = 4, // Random House
@@ -382,7 +373,6 @@ namespace Persistence
                     Edition = "Classic",
                     Summary = "A mystery novel by Agatha Christie",
                     PublicationYear = 1934,
-                    CoverImageUrl = "https://example.com/murder-orient.jpg",
                     Status = BookStatus.InLibrary,
                     LanguageId = 1, // English
                     PublisherId = 5, // Oxford University Press
