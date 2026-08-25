@@ -11,11 +11,15 @@ namespace Persistence
     public static class DataSeeder
     {
         private static readonly string[] RoleNames = { "Administrator", "Librarian", "Staff", "Member" };
+        private static readonly string AdministratorEmail = "Admin@example.com";
+        private static readonly string LibrarianEmail = "Librarian@example.com";
+        private static readonly string StaffEmail = "Staff@example.com";
 
 
         public static async Task DataSeederAsync(WebApplication app)
         {
             await SeedRolesAsync(app);
+            await SeedAdministratorUserAsync(app);
             await SeedLanguagesAsync(app);
             await SeedPublishersAsync(app);
             await SeedCategoriesAsync(app);
@@ -38,6 +42,68 @@ namespace Persistence
                 {
                     if (!await roleManager.RoleExistsAsync(roleName))
                         await roleManager.CreateAsync(new Role { Name = roleName });
+                }
+            }
+        }
+
+        public static async Task SeedAdministratorUserAsync(WebApplication app)
+        {
+            var scope = app.Services.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+            // Check if the administrator user already exists
+            if (await userManager.FindByEmailAsync(AdministratorEmail) == null)
+            {
+                var adminUser = new User
+                {
+                    UserName = "Administrator",
+                    Email = AdministratorEmail,
+                    EmailConfirmed = true,
+                    IsMember = false,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var result = await userManager.CreateAsync(adminUser, "Test@123");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Administrator");
+                }
+            }
+
+            if (await userManager.FindByEmailAsync(LibrarianEmail) == null)
+            {
+                var librarianUser = new User
+                {
+                    UserName = "Librarian",
+                    Email = LibrarianEmail,
+                    EmailConfirmed = true,
+                    IsMember = false,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                var result = await userManager.CreateAsync(librarianUser, "Test@123");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(librarianUser, "Librarian");
+                }
+            }
+
+            if(await userManager.FindByEmailAsync(StaffEmail) == null)
+            {
+                var staffUser = new User
+                {
+                    UserName = "Staff",
+                    Email = StaffEmail,
+                    EmailConfirmed = true,
+                    IsMember = false,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                var result = await userManager.CreateAsync(staffUser, "Test@123");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(staffUser, "Staff");
                 }
             }
         }
