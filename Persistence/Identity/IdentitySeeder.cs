@@ -401,7 +401,7 @@ namespace Persistence.Identity
                     MembershipDate = DateTime.UtcNow.AddMonths(-6),
                     Status = MembershipStatus.Active,
                     CreatedAt = DateTime.UtcNow
-                }, "SecurePass123!", "Member"),
+                }, "Test@123", "Member"),
                 (new User
                 {
                     UserName = "jane_smith",
@@ -412,7 +412,7 @@ namespace Persistence.Identity
                     MembershipDate = DateTime.UtcNow.AddMonths(-3),
                     Status = MembershipStatus.Active,
                     CreatedAt = DateTime.UtcNow
-                }, "SecurePass123!", "Member"),
+                }, "Test@123", "Member"),
                 (new User
                 {
                     UserName = "bob_wilson",
@@ -423,7 +423,7 @@ namespace Persistence.Identity
                     MembershipDate = DateTime.UtcNow.AddMonths(-12),
                     Status = MembershipStatus.Active,
                     CreatedAt = DateTime.UtcNow
-                }, "SecurePass123!", "Member"),
+                }, "Test@123", "Member"),
                 (new User
                 {
                     UserName = "librarian_admin",
@@ -431,7 +431,7 @@ namespace Persistence.Identity
                     EmailConfirmed = true,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
-                }, "SecurePass123!", "Librarian")
+                }, "Test@123", "Librarian")
             };
 
             foreach (var (user, password, role) in memberUsers)
