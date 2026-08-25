@@ -320,6 +320,13 @@ curl -X GET https://localhost:7152/api/categories \
 
 ## Database Relationships (ERD)
 
+![Library Management System ERD](assets/erd.png)
+
+`Book` is the hub, linked directly to `Language` and `Publisher`, and to `Author`/`Category` through the `BookAuthor`/`BookCategory` junction tables. `User` connects out to `BorrowingTransaction`, `RefreshToken`, and `ActivityLog`.
+
+<details>
+<summary>Mermaid source (renders live on GitHub)</summary>
+
 ```mermaid
 erDiagram
   USER ||--o{ BORROWINGTRANSACTION : borrows
@@ -401,7 +408,7 @@ erDiagram
   }
 ```
 
-> Renders automatically on GitHub. `Book` is the hub, linked directly to `Language` and `Publisher`, and to `Author`/`Category` through the `BookAuthor`/`BookCategory` junction tables. `User` connects out to `BorrowingTransaction`, `RefreshToken`, and `ActivityLog`.
+</details>
 
 ---
 
