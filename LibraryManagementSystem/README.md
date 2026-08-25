@@ -1,571 +1,546 @@
 # Library Management System API
 
-A comprehensive RESTful API for managing library operations, built with ASP.NET Core, Entity Framework Core, and PostgreSQL. The system provides user authentication, book management, borrowing transactions, and comprehensive access control.
+A comprehensive RESTful API for managing library operations, built with ASP.NET Core, Entity Framework Core, PostgreSQL, and ASP.NET Identity. The system provides secure authentication, role management, catalog management, borrowing transactions, audit logging, and scalable architecture following Clean/Layered Architecture principles.
 
-## Quick Start
+---
 
-### Clone & Setup
+# Quick Start
+
+## Clone Repository
+
 ```bash
 git clone https://github.com/Abdallah85/LibraryManagementSystem.git
+
 cd LibraryManagementSystem
+```
+
+## Restore Dependencies
+
+```bash
 dotnet restore
 ```
 
-### Configure Database
-Edit `LibraryManagementSystem/appsettings.json`:
+## Configure Database
+
+Edit `appsettings.json`:
+
 ```json
 {
   "ConnectionStrings": {
-	"DefaultConnection": "Host=localhost;Port=5432;Database=mydatabase;Username=admin;Password=admin"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres"
   },
+
   "Jwt": {
-	"Secret": "[Your-32-char-Base64-secret]",
-	"Issuer": "LibrarySystem",
-	"Audience": "LibrarySystemClient"
+    "Secret": "YOUR_32_CHARACTER_SECRET_KEY",
+    "Issuer": "LibrarySystem",
+    "Audience": "LibrarySystemClient"
   }
 }
 ```
 
-### Run the API
+## Run Application
+
 ```bash
 dotnet run --project LibraryManagementSystem
 ```
 
-**API Endpoints**:
-- **HTTP**: `http://localhost:5167`
-- **HTTPS**: `https://localhost:7152`
-- **Swagger**: `https://localhost:7152/swagger/index.html`
+---
+
+# Application URLs
+
+| Service | URL |
+|----------|------|
+| HTTP | http://localhost:5167 |
+| HTTPS | https://localhost:7152 |
+| Swagger UI | https://localhost:7152/swagger/index.html |
 
 ---
 
-## Project Overview
+# Technology Stack
 
-### Purpose
-Backend service for managing library operations: user authentication, book cataloging, borrowing transactions, and access control.
-
-### Main Features
-- ✅ JWT-based authentication with refresh tokens
-- ✅ User registration and login with secure password hashing
-- ✅ Book catalog management (Categories, Languages, Publishers, Authors)
-- ✅ Borrowing and return transaction tracking
-- ✅ Role-based access control (Admin, Librarian, Staff, Member)
-- ✅ Activity logging for audit trails
-- ✅ Soft delete support
-- ✅ Comprehensive error handling
-
-### Tech Stack
-- **Framework**: ASP.NET Core 10
-- **Database**: PostgreSQL 12+
-- **ORM**: Entity Framework Core
-- **Authentication**: JWT with refresh tokens
-- **API Docs**: Swagger/OpenAPI
-- **Container**: Docker & Docker Compose
+| Category | Technology |
+|-----------|-------------|
+| Backend | ASP.NET Core |
+| Database | PostgreSQL |
+| ORM | Entity Framework Core |
+| Authentication | ASP.NET Identity + JWT |
+| Documentation | Swagger/OpenAPI |
+| Architecture | Layered Architecture |
+| Containerization | Docker |
 
 ---
 
-## Architecture
+# Architecture Overview
 
-### Layered Architecture Pattern
-
+```text
+┌───────────────────────────────────────┐
+│             Presentation              │
+│          Controllers / APIs           │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│              Services                 │
+│           Business Logic              │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│               Domain                  │
+│ Entities / Enums / Exceptions         │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│            Persistence                │
+│ EF Core / Repositories / UoW          │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+             PostgreSQL
 ```
-┌─────────────────────────────────┐
-│   Presentation Layer            │  Controllers (AuthController, etc.)
-│                                 │
-├─────────────────────────────────┤
-│   Application Services Layer    │  Services (AuthService, CategoryService, etc.)
-│                                 │
-├─────────────────────────────────┤
-│   Domain Layer                  │  Entities, Enums, Custom Exceptions
-│                                 │
-├─────────────────────────────────┤
-│   Persistence Layer             │  DbContext, Repositories, UnitOfWork
-│                                 │
-└──────────────┬──────────────────┘
-			   │
-		PostgreSQL Database
-```
-
-### Projects
-
-| Project | Purpose |
-|---------|---------|
-| **LibraryManagementSystemApi** | Main API, middleware, startup |
-| **Presentation** | HTTP Controllers |
-| **Services** | Business logic (CRUD, validation) |
-| **ServicesAbstractions** | Service interfaces |
-| **Domain** | Entities, enums, exceptions |
-| **Persistence** | EF Core DbContext, repositories |
-| **Shared** | DTOs, response models, configs |
 
 ---
 
-## Database Setup
+# Solution Structure
 
-### Auto-Initialization
-Database is **automatically created and seeded** on first run:
+| Project | Responsibility |
+|----------|---------------|
+| LibraryManagementSystemApi | Application startup & configuration |
+| Presentation | API Controllers |
+| Services | Business Logic |
+| ServicesAbstractions | Interfaces |
+| Domain | Entities and Models |
+| Persistence | EF Core, Repositories, DbContext |
+| Shared | DTOs and Shared Models |
+
+---
+
+# Database Initialization
+
+The application automatically:
+
+- Creates the database
+- Applies migrations
+- Seeds default roles
+
+Simply run:
+
 ```bash
-dotnet run  # Creates DB + tables + default roles
+dotnet run
 ```
-
-### Manual Migration (if needed)
-```bash
-# Create migration after model changes
-dotnet ef migrations add [MigrationName] --project Persistence --startup-project LibraryManagementSystem
-
-# Apply migrations
-dotnet ef database update --startup-project LibraryManagementSystem
-```
-
-### Default Seeded Roles
-- **Administrator** - Full access
-- **Librarian** - Library staff
-- **Staff** - General operations
-- **Member** - Default user role
 
 ---
 
-## API Endpoints
+# Seeded Roles
 
-### Authentication (No token required)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/register` | Register new user → gets JWT + refresh token |
-| `POST` | `/api/auth/login` | Login with email/username → gets JWT + refresh token |
-| `POST` | `/api/auth/refresh-token` | Use refresh token → get new access token |
-
-### Categories (Requires authentication)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/categories` | Create category |
-| `GET` | `/api/categories` | Get all categories (pageable) |
-| `GET` | `/api/categories/{id}` | Get category by ID |
-| `PUT` | `/api/categories/{id}` | Update category |
-| `DELETE` | `/api/categories/{id}` | Delete category |
-
-### Languages (Requires authentication)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/languages` | Create language |
-| `GET` | `/api/languages` | Get all languages (pageable) |
-| `GET` | `/api/languages/{id}` | Get language by ID |
-| `PUT` | `/api/languages/{id}` | Update language |
-| `DELETE` | `/api/languages/{id}` | Delete language |
-
-### Publishers (Requires authentication)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/publishers` | Create publisher |
-| `GET` | `/api/publishers` | Get all publishers (pageable) |
-| `GET` | `/api/publishers/{id}` | Get publisher by ID |
-| `PUT` | `/api/publishers/{id}` | Update publisher |
-| `DELETE` | `/api/publishers/{id}` | Delete publisher |
+| Role |
+|--------|
+| Administrator |
+| Librarian |
+| Staff |
+| Member |
 
 ---
 
-## Authentication & JWT
+# Authentication Flow
 
-### Registration Example
-```bash
-curl -X POST https://localhost:7152/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-	"username": "john_doe",
-	"email": "john@example.com",
-	"password": "SecurePass123!"
-  }'
+## Register
+
+```http
+POST /api/auth/register
 ```
 
-**Response**:
+### Request
+
+```json
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+### Response
+
 ```json
 {
   "success": true,
-  "message": "Registration successful.",
+  "message": "Registration successful",
   "data": {
-	"accessToken": "eyJhbGciOiJIUzI1NiIs...",
-	"accessTokenExpiresAt": "2026-01-20T12:45:30Z",
-	"refreshToken": "base64_encoded_token",
-	"refreshTokenExpiresAt": "2026-01-27T12:45:30Z",
-	"userId": "user-guid",
-	"username": "john_doe",
-	"role": "Member"
+    "accessToken": "...",
+    "refreshToken": "...",
+    "userId": "...",
+    "username": "john_doe",
+    "role": "Member"
   }
 }
 ```
 
-### Using Token in Protected Endpoints
-```bash
-curl -X GET https://localhost:7152/api/categories \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+---
+
+## Login
+
+```http
+POST /api/auth/login
 ```
-
-### Token Details
-- **Access Token**: Expires in 15 minutes
-- **Refresh Token**: Expires in 7 days, hashed in DB
-- **Algorithm**: HMAC SHA256
-- **Issuer**: LibrarySystem
-- **Audience**: LibrarySystemClient
-
-### Swagger Authorization
-1. Click **Authorize** button (top-right)
-2. Enter: `Bearer YOUR_ACCESS_TOKEN`
-3. All subsequent requests auto-include the token
 
 ---
 
-## Configuration
+## Refresh Token
 
-### appsettings.json Structure
-```json
-{
-  "ConnectionStrings": {
-	"DefaultConnection": "Host=localhost;Port=5432;Database=library;Username=admin;Password=admin"
-  },
-  "Jwt": {
-	"Secret": "32-char-base64-encoded-secret",
-	"Issuer": "LibrarySystem",
-	"Audience": "LibrarySystemClient",
-	"AccessTokenExpirationMinutes": 15,
-	"RefreshTokenExpirationDays": 7
-  },
-  "Logging": {
-	"LogLevel": {
-	  "Default": "Information",
-	  "Microsoft.AspNetCore": "Warning"
-	}
-  }
-}
+```http
+POST /api/auth/refresh-token
 ```
-
-### Password Requirements
-- Minimum 8 characters
-- At least 1 uppercase letter (A-Z)
-- At least 1 lowercase letter (a-z)
-- At least 1 digit (0-9)
-- At least 1 special character (!@#$%^&*)
 
 ---
 
-## Error Handling
+# JWT Configuration
 
-### Error Response Format
-```json
-{
-  "errorCode": "NOT_FOUND",
-  "message": "Category with id 999 not found",
-  "details": null,
-  "traceId": "0HN8LGIT5A9BU:00000001",
-  "timestamp": "2026-01-20T12:30:45Z"
-}
-```
-
-### HTTP Status Codes
-| Status | Error Code | Scenario |
-|--------|-----------|----------|
-| **400** | BAD_REQUEST | Invalid input or business rule |
-| **401** | UNAUTHORIZED | Missing/invalid JWT or credentials |
-| **403** | FORBIDDEN | Insufficient permissions |
-| **404** | NOT_FOUND | Resource doesn't exist |
-| **409** | CONFLICT | Duplicate email/username/name |
-| **500** | INTERNAL_SERVER_ERROR | Unexpected server error |
+| Setting | Value |
+|-----------|---------|
+| Algorithm | HS256 |
+| Access Token Expiration | 15 Minutes |
+| Refresh Token Expiration | 7 Days |
+| Storage | Hashed in Database |
 
 ---
 
-## Database Schema (Key Entities)
+# Swagger Authentication
 
-### User (ASP.NET Identity)
-- Id (GUID)
-- UserName, Email
-- PasswordHash (hashed)
-- IsActive, IsMember
-- MembershipStatus
+1. Open Swagger UI
+2. Click **Authorize**
+3. Enter:
+
+```text
+Bearer YOUR_ACCESS_TOKEN
+```
+
+4. Execute secured endpoints
+
+---
+
+# API Endpoints
+
+## Authentication
+
+| Method | Endpoint |
+|----------|------------|
+| POST | /api/auth/register |
+| POST | /api/auth/login |
+| POST | /api/auth/refresh-token |
+
+---
+
+## Categories
+
+| Method | Endpoint |
+|----------|------------|
+| POST | /api/categories |
+| GET | /api/categories |
+| GET | /api/categories/{id} |
+| PUT | /api/categories/{id} |
+| DELETE | /api/categories/{id} |
+
+---
+
+## Languages
+
+| Method | Endpoint |
+|----------|------------|
+| POST | /api/languages |
+| GET | /api/languages |
+| GET | /api/languages/{id} |
+| PUT | /api/languages/{id} |
+| DELETE | /api/languages/{id} |
+
+---
+
+## Publishers
+
+| Method | Endpoint |
+|----------|------------|
+| POST | /api/publishers |
+| GET | /api/publishers |
+| GET | /api/publishers/{id} |
+| PUT | /api/publishers/{id} |
+| DELETE | /api/publishers/{id} |
+
+---
+
+# Database Schema
+
+## Main Entities
+
+### User
+
+```text
+Id
+UserName
+Email
+PasswordHash
+IsActive
+MembershipStatus
+```
 
 ### Book
-- Id (int)
-- ISBN, Title, Edition
-- PublicationYear
-- Status (InLibrary, CheckedOut)
-- LanguageId FK → Language
-- PublisherId FK → Publisher
 
-### Category
-- Id (int)
-- Name, Description
-
-### Language
-- Id (int)
-- Name, Code (e.g., "en", "ar")
-
-### Publisher
-- Id (int)
-- Name, Address, ContactEmail, Website
+```text
+Id
+ISBN
+Title
+Edition
+PublicationYear
+Status
+LanguageId
+PublisherId
+```
 
 ### Author
-- Id (int)
-- FullName, Bio
 
-### Many-to-Many Junctions
-- **BookAuthor**: Book ↔ Author
-- **BookCategory**: Book ↔ Category
+```text
+Id
+FullName
+Bio
+```
 
-### Transactions & Audit
-- **BorrowingTransaction**: Track checkouts/returns
-- **ActivityLog**: Audit trail
-- **RefreshToken**: Token management (hashed)
+### Category
+
+```text
+Id
+Name
+Description
+```
+
+### Language
+
+```text
+Id
+Name
+Code
+```
+
+### Publisher
+
+```text
+Id
+Name
+Address
+ContactEmail
+Website
+```
+
+### BorrowingTransaction
+
+```text
+Id
+UserId
+BookId
+BorrowedAt
+ReturnedAt
+```
+
+### RefreshToken
+
+```text
+Id
+UserId
+TokenHash
+ExpiresAt
+```
+
+### ActivityLog
+
+```text
+Id
+UserId
+Action
+CreatedAt
+```
 
 ---
 
-## Database Relationships (ERD)
-
-![Library Management System ERD](assets/erd.png)
-
-`Book` is the hub, linked directly to `Language` and `Publisher`, and to `Author`/`Category` through the `BookAuthor`/`BookCategory` junction tables. `User` connects out to `BorrowingTransaction`, `RefreshToken`, and `ActivityLog`.
-
-<details>
-<summary>Mermaid source (renders live on GitHub)</summary>
+# Database ERD
 
 ```mermaid
 erDiagram
-  USER ||--o{ BORROWINGTRANSACTION : borrows
-  BOOK ||--o{ BORROWINGTRANSACTION : "is borrowed in"
-  USER ||--o{ REFRESHTOKEN : has
-  USER ||--o{ ACTIVITYLOG : generates
-  LANGUAGE ||--o{ BOOK : "written in"
-  PUBLISHER ||--o{ BOOK : publishes
-  BOOK ||--o{ BOOKAUTHOR : has
-  AUTHOR ||--o{ BOOKAUTHOR : writes
-  BOOK ||--o{ BOOKCATEGORY : has
-  CATEGORY ||--o{ BOOKCATEGORY : classifies
 
-  USER {
-    guid Id PK
-    string UserName
-    string Email
-    string PasswordHash
-    bool IsActive
-    string MembershipStatus
-  }
-  BOOK {
-    int Id PK
-    string ISBN
-    string Title
-    string Edition
-    int PublicationYear
-    string Status
-    int LanguageId FK
-    int PublisherId FK
-  }
-  CATEGORY {
-    int Id PK
-    string Name
-    string Description
-  }
-  LANGUAGE {
-    int Id PK
-    string Name
-    string Code
-  }
-  PUBLISHER {
-    int Id PK
-    string Name
-    string Address
-    string ContactEmail
-  }
-  AUTHOR {
-    int Id PK
-    string FullName
-    string Bio
-  }
-  BOOKAUTHOR {
-    int BookId FK
-    int AuthorId FK
-  }
-  BOOKCATEGORY {
-    int BookId FK
-    int CategoryId FK
-  }
-  BORROWINGTRANSACTION {
-    int Id PK
-    guid UserId FK
-    int BookId FK
-    datetime BorrowedAt
-    datetime ReturnedAt
-  }
-  REFRESHTOKEN {
-    guid Id PK
-    guid UserId FK
-    string TokenHash
-    datetime ExpiresAt
-  }
-  ACTIVITYLOG {
-    guid Id PK
-    guid UserId FK
-    string Action
-    datetime CreatedAt
-  }
-```
+    USER ||--o{ BORROWINGTRANSACTION : borrows
+    BOOK ||--o{ BORROWINGTRANSACTION : borrowed
 
-</details>
+    USER ||--o{ REFRESHTOKEN : owns
+    USER ||--o{ ACTIVITYLOG : generates
 
----
+    LANGUAGE ||--o{ BOOK : contains
+    PUBLISHER ||--o{ BOOK : publishes
 
-## Docker
+    BOOK ||--o{ BOOKAUTHOR : has
+    AUTHOR ||--o{ BOOKAUTHOR : writes
 
-### Build Image
-```bash
-docker build -t library-management-api:latest -f LibraryManagementSystem/Dockerfile .
-```
+    BOOK ||--o{ BOOKCATEGORY : belongs
+    CATEGORY ||--o{ BOOKCATEGORY : classifies
 
-### Run Container
-```bash
-docker run -d \
-  --name library-api \
-  -p 8080:8080 \
-  -p 8081:8081 \
-  -e "ConnectionStrings:DefaultConnection=Host=postgres;Port=5432;Database=library;Username=admin;Password=admin" \
-  -e "Jwt:Secret=YOUR_JWT_SECRET" \
-  library-management-api:latest
-```
+    USER {
+        guid Id PK
+        string UserName
+        string Email
+        bool IsActive
+        string MembershipStatus
+    }
 
-### Ports
-- **HTTP**: 8080
-- **HTTPS**: 8081
+    BOOK {
+        int Id PK
+        string ISBN
+        string Title
+        string Edition
+        int PublicationYear
+        string Status
+        int LanguageId FK
+        int PublisherId FK
+    }
 
----
+    AUTHOR {
+        int Id PK
+        string FullName
+        string Bio
+    }
 
-## Validation Rules
+    CATEGORY {
+        int Id PK
+        string Name
+        string Description
+    }
 
-### RegisterRequest
-- Username: 3-100 chars, required
-- Email: Valid email format, required
-- Password: 8+ chars, mixed case, digit, special char
+    LANGUAGE {
+        int Id PK
+        string Name
+        string Code
+    }
 
-### CreateCategoryDto
-- Name: Required, Max 255 chars
-- Description: Optional
+    PUBLISHER {
+        int Id PK
+        string Name
+        string Address
+        string ContactEmail
+        string Website
+    }
 
-### CreateLanguageDto
-- Name: Required
-- Code: Required (e.g., "en", "ar", "fr")
+    BOOKAUTHOR {
+        int BookId FK
+        int AuthorId FK
+    }
 
-### CreatePublisherDto
-- Name: Required
-- Address, ContactEmail, Website: Optional
+    BOOKCATEGORY {
+        int BookId FK
+        int CategoryId FK
+    }
 
----
+    BORROWINGTRANSACTION {
+        int Id PK
+        guid UserId FK
+        int BookId FK
+        datetime BorrowedAt
+        datetime ReturnedAt
+    }
 
-## Development
+    REFRESHTOKEN {
+        guid Id PK
+        guid UserId FK
+        string TokenHash
+        datetime ExpiresAt
+    }
 
-### Key Design Patterns
-- **Repository Pattern**: Generic CRUD via `IGenericRepository<T>`
-- **Unit of Work**: Transactional consistency
-- **Specification Pattern**: Dynamic query building
-- **Dependency Injection**: Loose coupling via interfaces
-- **Service Layer**: Business logic encapsulation
-
-### Important Implementation Details
-
-1. **Refresh Token Security**
-   - Tokens are hashed (SHA256) before storage
-   - Only hash persists in DB (not raw token)
-   - Auto-revoked after use
-
-2. **Audit Trail**
-   - CreatedBy, UpdatedBy track user IDs
-   - CreatedAt, UpdatedAt auto-populated
-   - Soft delete via IsDeleted flag
-
-3. **JWT Claims**
-   - sub: User ID
-   - name: Username
-   - email: Email
-   - jti: Unique token ID
-   - role: User roles (repeatable)
-
-4. **Middleware Pipeline**
-   - Swagger → HTTPS → Authentication → Authorization → Routing → Controllers → Exception Handler
-
-### Known Limitations
-
-⚠️ **Missing Features**:
-- No pagination implementation (query params exist but ignored)
-- No role-based endpoint authorization (all authenticated users have access)
-- No Book/Author/BorrowingTransaction API endpoints
-- Single configuration file (use env vars for secrets)
-
-✅ **Recommendations**:
-1. Implement `.Skip().Take()` for pagination
-2. Add `[Authorize(Roles = "Administrator")]` to sensitive endpoints
-3. Create full CRUD endpoints for all entities
-4. Use Azure Key Vault or HashiCorp Vault for secrets
-5. Add request logging middleware
-6. Implement caching (Redis) for frequently accessed data
-
----
-
-## Running in Development
-
-### Prerequisites
-- .NET SDK 10.0+
-- PostgreSQL 12+
-- Visual Studio/VS Code (optional)
-
-### Steps
-1. Clone: `git clone https://github.com/Abdallah85/LibraryManagementSystem.git`
-2. Configure: Edit `appsettings.json` with DB connection
-3. Restore: `dotnet restore`
-4. Build: `dotnet build`
-5. Run: `dotnet run --project LibraryManagementSystem`
-
-### Verify Running
-```bash
-curl https://localhost:7152/swagger/index.html
-# Should load Swagger UI
+    ACTIVITYLOG {
+        guid Id PK
+        guid UserId FK
+        string Action
+        datetime CreatedAt
+    }
 ```
 
 ---
 
-## API Response Format
+# Validation Rules
 
-### Success Response
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": { /* actual data */ }
-}
-```
+## Register User
 
-### Error Response
+| Field | Validation |
+|---------|-----------|
+| Username | Required, 3-100 chars |
+| Email | Valid Email |
+| Password | Minimum 8 chars |
+
+Password must contain:
+
+- Uppercase letter
+- Lowercase letter
+- Number
+- Special character
+
+---
+
+# Error Response Format
+
 ```json
 {
   "errorCode": "NOT_FOUND",
-  "message": "Resource not found",
+  "message": "Category not found",
   "details": null,
-  "traceId": "unique-id",
+  "traceId": "xxxx",
   "timestamp": "2026-01-20T12:30:45Z"
 }
 ```
 
 ---
 
-## Security Considerations
+# HTTP Status Codes
 
-✅ **Implemented**:
-- Password hashing via ASP.NET Identity (PBKDF2)
-- JWT signature verification
-- Token expiration validation
-- Refresh token revocation
-- HTTPS enforcement
-- SQL injection protection (EF Core parameterized queries)
-- Soft deletes preserve data integrity
-
+| Code | Meaning |
+|--------|----------|
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 409 | Conflict |
+| 500 | Internal Server Error |
 
 ---
 
-## License
+# Security Features
 
-See LICENSE file in repository.
+Implemented:
+
+- ASP.NET Identity Password Hashing
+- JWT Authentication
+- Refresh Token Rotation
+- HTTPS Enforcement
+- SQL Injection Protection
+- Soft Delete Support
+- Audit Logging
+
+---
+
+# Docker
+
+## Build
+
+```bash
+docker build -t library-management-api .
+```
+
+## Run
+
+```bash
+docker run -d \
+-p 8080:8080 \
+-p 8081:8081 \
+--name library-api \
+library-management-api
+```
+
+---
+
+
+# License
+
+See LICENSE file for details.
