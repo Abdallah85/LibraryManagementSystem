@@ -143,6 +143,22 @@ dotnet run
 
 ---
 
+
+# Seeded Accounts
+
+On first run, the application seeds one default account per role (except Member, which is self-registered). All seeded accounts use the same password.
+
+| Role | Email | Password |
+|--------|--------|-----------|
+| Administrator | Admin@example.com | Test@123 |
+| Librarian | Librarian@example.com | Test@123 |
+| Staff | Staff@example.com | Test@123 |
+| Member | member1@library.com | Test@123 |
+
+> ⚠️ These are default development credentials. Change or remove them before deploying to any shared or production environment.
+
+---
+
 # Authentication Flow
 
 ## Register
@@ -243,6 +259,49 @@ Bearer YOUR_ACCESS_TOKEN
 | DELETE | /api/categories/{id} |
 
 ---
+## Books
+
+| Method | Endpoint |
+|----------|------------|
+| GET | /api/book |
+| GET | /api/book/{id} |
+| POST | /api/book |
+| PUT | /api/book/{id} |
+| DELETE | /api/book/{id} |
+
+---
+
+## Borrowing
+
+| Method | Endpoint |
+|----------|------------|
+| POST | /api/borrowing |
+| PUT | /api/borrowing/{transactionId}/review |
+| GET | /api/borrowing/my-transactions |
+| GET | /api/borrowing |
+| PUT | /api/borrowing/{transactionId}/confirm-return |
+| PUT | /api/borrowing/{transactionId}/return |
+
+---
+
+## Users
+
+| Method | Endpoint |
+|----------|------------|
+| GET | /api/user |
+| GET | /api/user/{id} |
+| POST | /api/user |
+| PUT | /api/user/{id} |
+| DELETE | /api/user/{id} |
+
+---
+
+## Activity Logs
+
+| Method | Endpoint |
+|----------|------------|
+| GET | /api/activitylog |
+
 
 ## Languages
 
@@ -504,7 +563,7 @@ Password must contain:
 | 409 | Conflict |
 | 500 | Internal Server Error |
 
----
+
 
 # Security Features
 
