@@ -4,6 +4,7 @@ using Domain.Exceptions;
 using Services.Specifications;
 using ServicesAbstractions;
 using Shared;
+using Shared.Dtos.ActivityLog;
 using Shared.Dtos.Category;
 using System.Linq.Expressions;
 
@@ -12,10 +13,12 @@ namespace Services
     public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IActivityLogService _activityLog;
 
-        public CategoryService(IUnitOfWork unitOfWork)
+        public CategoryService(IUnitOfWork unitOfWork, IActivityLogService activityLog)
         {
             _unitOfWork = unitOfWork;
+            _activityLog = activityLog;
         }
 
         public async Task<ApiResponse<string>> CreateCategoryAsync(CreateCategoryDto dto)
@@ -34,6 +37,16 @@ namespace Services
 
             _unitOfWork.GetRepository<Category>().Add(category);
             await _unitOfWork.SaveChangesAsync();
+
+            // Log the activity
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                EntityId = category.Id,
+                EntityAffected = nameof(Category),
+                Details = $"Category '{category.Name}' created",
+                Action = "Create",
+                UserId = dto.CreatedBy
+            });
 
             return new ApiResponse<string>
             {
@@ -61,7 +74,16 @@ namespace Services
             existingCategory.Description = dto.Description ?? existingCategory.Description;
 
             _unitOfWork.GetRepository<Category>().Update(existingCategory);
-            await _unitOfWork.SaveChangesAsync();
+
+            // Log the activity
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                EntityId = existingCategory.Id,
+                EntityAffected = nameof(Category),
+                Details = $"Category '{existingCategory.Name}' updated",
+                Action = "Update",
+                UserId = dto.UpdatedBy
+            });
 
             return new ApiResponse<string>
             {
@@ -71,7 +93,7 @@ namespace Services
             };
         }
 
-        public async Task<ApiResponse<string>> DeleteCategoryAsync(int categoryId)
+        public async Task<ApiResponse<string>> DeleteCategoryAsync(int categoryId, string deletedBy)
         {
             var spec = new GeneralSpecifications<Category>(c => c.Id == categoryId);
             var existingCategory = await _unitOfWork.GetRepository<Category>().GetAsync(spec);
@@ -79,7 +101,16 @@ namespace Services
             if (existingCategory is null) throw new NotFoundException($"Category with id {categoryId} not found");
 
             _unitOfWork.GetRepository<Category>().Delete(existingCategory);
-            await _unitOfWork.SaveChangesAsync();
+
+            // Log the activity
+            await _activityLog.LogAsync(new CreateActivityLogDto
+            {
+                EntityId = existingCategory.Id,
+                EntityAffected = nameof(Category),
+                Details = $"Category '{existingCategory.Name}' deleted",
+                Action = "Delete",
+                UserId = deletedBy
+            });
 
             return new ApiResponse<string>
             {

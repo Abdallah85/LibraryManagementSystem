@@ -7,7 +7,7 @@ namespace ServicesAbstractions
     {
         Task<ApiResponse<string>> CreateCategoryAsync(CreateCategoryDto dto);
         Task<ApiResponse<string>> UpdateCategoryAsync(int categoryId, UpdateCategoryDto dto);
-        Task<ApiResponse<string>> DeleteCategoryAsync(int categoryId);
+        Task<ApiResponse<string>> DeleteCategoryAsync(int categoryId, string deletedBy);
         Task<ApiResponse<CategoryResponseDto>> GetCategoryByIdAsync(int categoryId);
         Task<ApiResponse<PaginatedResponse<CategoryResponseDto>>> GetAllCategoriesAsync(CategorySearchFilterDto filterDto);
     }
