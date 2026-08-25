@@ -143,6 +143,23 @@ dotnet run
 
 ---
 
+---
+
+# Seeded Accounts
+
+On first run, the application seeds one default account per role (except Member, which is self-registered). All seeded accounts use the same password.
+
+| Role | Email | Password |
+|--------|--------|-----------|
+| Administrator | Admin@example.com | Test@123 |
+| Librarian | Librarian@example.com | Test@123 |
+| Staff | Staff@example.com | Test@123 |
+| Member | member1@library.com | Test@123 |
+
+> ⚠️ These are default development credentials. Change or remove them before deploying to any shared or production environment.
+
+---
+
 # Authentication Flow
 
 ## Register
@@ -547,22 +564,7 @@ Password must contain:
 | 409 | Conflict |
 | 500 | Internal Server Error |
 
----
 
-# Seeded Accounts
-
-On first run, the application seeds one default account per role (except Member, which is self-registered). All seeded accounts use the same password.
-
-| Role | Email | Password |
-|--------|--------|-----------|
-| Administrator | Admin@example.com | Test@123 |
-| Librarian | Librarian@example.com | Test@123 |
-| Staff | Staff@example.com | Test@123 |
-| Member | member1@library.com | Test@123 |
-
-> ⚠️ These are default development credentials. Change or remove them before deploying to any shared or production environment.
-
----
 
 # Security Features
 
