@@ -1,10 +1,7 @@
 
 using LibraryManagementSystemApi;
 using LibraryManagementSystemApi.Middelwares;
-using Microsoft.OpenApi;
 using Persistence;
-using Persistence.Identity;
-using Presentation;
 using Services.Extension;
 
 namespace LibraryManagementSystem
@@ -25,7 +22,8 @@ namespace LibraryManagementSystem
 
             var app = builder.Build();
 
-            await IdentitySeeder.InitIdentityAsync(app);
+            await InitDb.InitDbAsync(app);
+            await DataSeeder.DataSeederAsync(app);
 
             app.UseSwagger();    
             app.UseSwaggerUI();

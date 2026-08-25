@@ -6,14 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data;
 
 
-namespace Persistence.Identity
+namespace Persistence
 {
-    public static class IdentitySeeder
+    public static class DataSeeder
     {
         private static readonly string[] RoleNames = { "Administrator", "Librarian", "Staff", "Member" };
 
 
-        public static async Task InitIdentityAsync(WebApplication app)
+        public static async Task DataSeederAsync(WebApplication app)
         {
             await SeedRolesAsync(app);
             await SeedLanguagesAsync(app);
